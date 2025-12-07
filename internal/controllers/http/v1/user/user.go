@@ -2,6 +2,7 @@ package user
 
 import (
 	"context"
+	"main/internal/entity"
 	"main/internal/usecase/user"
 	"net/http"
 	"strconv"
@@ -98,7 +99,7 @@ func (uc Controller) AdminDeleteUser(c *gin.Context) {
 }
 
 func (uc Controller) AdminGetUserList(c *gin.Context) {
-	var filter user.Filter
+	var filter entity.Filter
 	query := c.Request.URL.Query()
 
 	limitQ := query["limit"]

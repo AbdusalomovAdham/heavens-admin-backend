@@ -3,7 +3,6 @@ package roomtype
 import (
 	"context"
 	"main/internal/entity"
-	"main/internal/usecase/user"
 )
 
 type Repository interface {
@@ -11,7 +10,7 @@ type Repository interface {
 	Update(ctx context.Context, data Create, userId, id int64) (int64, error)
 	Delete(ctx context.Context, id, userID int64) error
 	GetById(ctx context.Context, id int64) (entity.RoomType, error)
-	GetList(ctx context.Context, filter *user.Filter, userId int64) ([]entity.RoomType, uint32, error)
+	GetList(ctx context.Context, filter *entity.Filter, userId int64) ([]entity.RoomType, uint32, error)
 }
 
 type Auth interface {

@@ -6,7 +6,6 @@ import (
 	"log"
 	"main/internal/entity"
 	roomtype "main/internal/usecase/room_type"
-	"main/internal/usecase/user"
 	"strings"
 
 	"github.com/uptrace/bun"
@@ -64,7 +63,7 @@ func (r Repository) Update(ctx context.Context, data roomtype.Create, userId, id
 	return id, nil
 }
 
-func (r Repository) GetList(ctx context.Context, filter *user.Filter, userId int64) ([]entity.RoomType, uint32, error) {
+func (r Repository) GetList(ctx context.Context, filter *entity.Filter, userId int64) ([]entity.RoomType, uint32, error) {
 	var list []entity.RoomType
 	var limitQuery, offsetQuery string
 	whereQuery := "WHERE r.deleted_at IS NULL AND r.deleted_at IS NULL"

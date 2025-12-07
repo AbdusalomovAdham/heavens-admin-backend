@@ -2,8 +2,8 @@ package room
 
 import (
 	"context"
+	"main/internal/entity"
 	roomtype "main/internal/usecase/room_type"
-	"main/internal/usecase/user"
 	"net/http"
 	"strconv"
 
@@ -63,7 +63,7 @@ func (ac *Controller) AdminDeleteRoomType(c *gin.Context) {
 
 func (ac *Controller) AdminGetRoomTypeList(c *gin.Context) {
 
-	var filter user.Filter
+	var filter entity.Filter
 	query := c.Request.URL.Query()
 
 	limitQ := query["limit"]

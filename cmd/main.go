@@ -3,28 +3,34 @@ package main
 import (
 	auth_controller "main/internal/controllers/http/v1/auth"
 
-	departament_controller "main/internal/controllers/http/v1/departament"
+	department_controller "main/internal/controllers/http/v1/department"
 	qr_controller "main/internal/controllers/http/v1/qr_code"
+	role_controller "main/internal/controllers/http/v1/role"
 	room_controller "main/internal/controllers/http/v1/room"
 	room_type_controller "main/internal/controllers/http/v1/room_type"
 	user_controller "main/internal/controllers/http/v1/user"
+	work_status_controller "main/internal/controllers/http/v1/work_status"
 	auth_middleware "main/internal/middleware/auth"
 	"main/internal/pkg/config"
 	"main/internal/pkg/postgres"
-	"main/internal/repository/postgres/departament"
+	department "main/internal/repository/postgres/department"
 	"main/internal/repository/postgres/qr"
+	"main/internal/repository/postgres/role"
 	"main/internal/repository/postgres/room"
 	roomtype "main/internal/repository/postgres/room_type"
 	"main/internal/repository/postgres/user"
+	work_status "main/internal/repository/postgres/work_status"
 	"main/internal/services/auth"
 	file_service "main/internal/services/file"
 
 	auth_use_case "main/internal/usecase/auth"
-	departament_use_case "main/internal/usecase/departament"
+	department_use_case "main/internal/usecase/department"
 	qr_use_case "main/internal/usecase/qr_code"
+	role_use_case "main/internal/usecase/role"
 	room_use_case "main/internal/usecase/room"
 	room_type_use_case "main/internal/usecase/room_type"
 	user_use_case "main/internal/usecase/user"
+	work_status_use_case "main/internal/usecase/work_status"
 	"time"
 
 	"github.com/gin-contrib/cors"
@@ -46,8 +52,10 @@ func main() {
 	userRepository := user.NewRepository(postgresDB)
 	roomRepository := room.NewRepository(postgresDB)
 	qrCodeRepository := qr.NewRepository(postgresDB)
-	departamentRepository := departament.NewRepository(postgresDB)
+	departmentRepository := department.NewRepository(postgresDB)
 	roomTypeRepository := roomtype.NewRepository(postgresDB)
+	roleRepository := role.NewRepository(postgresDB)
+	workStatusRepository := work_status.NewRepository(postgresDB)
 
 	//services
 	authService := auth.NewService(userRepository)
@@ -63,16 +71,20 @@ func main() {
 	userUseCase := user_use_case.NewUseCase(userRepository, authService, fileService)
 	roomUseCase := room_use_case.NewUseCase(roomRepository, authService)
 	qrCodeUseCase := qr_use_case.NewUseCase(qrCodeRepository, fileService, authService)
-	departamentUseCase := departament_use_case.NewUseCase(departamentRepository, authService)
+	departmentUseCase := department_use_case.NewUseCase(departmentRepository, authService)
 	roomTypeUseCase := room_type_use_case.NewUseCase(roomTypeRepository, authService)
+	roleUseCase := role_use_case.NewUseCase(roleRepository, authService)
+	workStatusUseCase := work_status_use_case.NewUseCase(workStatusRepository, authService)
 
 	//controller
 	authController := auth_controller.NewController(authUseCase)
 	userController := user_controller.NewController(userUseCase)
 	roomController := room_controller.NewController(roomUseCase)
 	qrCodeController := qr_controller.NewController(qrCodeUseCase)
-	departamentController := departament_controller.NewController(departamentUseCase)
+	departmentController := department_controller.NewController(departmentUseCase)
 	roomTypeController := room_type_controller.NewController(roomTypeUseCase)
+	roleController := role_controller.NewController(roleUseCase)
+	workStatusController := work_status_controller.NewController(workStatusUseCase)
 
 	//middleware
 	authMiddleware := auth_middleware.NewMiddleware(authService)
@@ -121,17 +133,17 @@ func main() {
 		// create
 		v1.POST("/admin/generate/qr", authMiddleware.AuthMiddleware(), qrCodeController.AdminGenerateQRCode)
 
-		// #departament
+		// #department
 		// create
-		v1.POST("/admin/departament/create", authMiddleware.AuthMiddleware(), departamentController.AdminCreateDepartament)
+		v1.POST("/admin/department/create", authMiddleware.AuthMiddleware(), departmentController.AdminCreateDepartment)
 		// delete
-		v1.DELETE("/admin/departament/delete/:id", authMiddleware.AuthMiddleware(), departamentController.AdminDeleteDepartament)
+		v1.DELETE("/admin/department/delete/:id", authMiddleware.AuthMiddleware(), departmentController.AdminDeleteDepartment)
 		// list
-		v1.GET("/admin/departament/list", authMiddleware.AuthMiddleware(), departamentController.AdminGetDepartamentList)
+		v1.GET("/admin/department/list", authMiddleware.AuthMiddleware(), departmentController.AdminGetDepartmentList)
 		// get by id
-		v1.GET("/admin/departament/:id", authMiddleware.AuthMiddleware(), departamentController.AdminGetDepartamentById)
+		v1.GET("/admin/department/:id", authMiddleware.AuthMiddleware(), departmentController.AdminGetDepartmentById)
 		// update
-		v1.PATCH("/admin/departament/update/:id", authMiddleware.AuthMiddleware(), departamentController.AdminUpdateDepartament)
+		v1.PATCH("/admin/department/update/:id", authMiddleware.AuthMiddleware(), departmentController.AdminUpdateDepartment)
 
 		// #room_type
 		// create
@@ -144,6 +156,30 @@ func main() {
 		v1.GET("/admin/room_type/:id", authMiddleware.AuthMiddleware(), roomTypeController.AdminGetRoomTypeById)
 		// update
 		v1.PATCH("/admin/room_type/update/:id", authMiddleware.AuthMiddleware(), roomTypeController.AdminUpdateRoomType)
+
+		// #role
+		// create
+		v1.POST("/admin/role/create", authMiddleware.AuthMiddleware(), roleController.AdminCreateRole)
+		// delete
+		v1.DELETE("/admin/role/delete/:id", authMiddleware.AuthMiddleware(), roleController.AdminDeleteRole)
+		// list
+		v1.GET("/admin/role/list", authMiddleware.AuthMiddleware(), roleController.AdminGetRoleList)
+		// get by id
+		v1.GET("/admin/role/:id", authMiddleware.AuthMiddleware(), roleController.AdminGetRoleById)
+		// update
+		v1.PATCH("/admin/role/update/:id", authMiddleware.AuthMiddleware(), roleController.AdminUpdateRole)
+
+		// #work_status
+		// create
+		v1.POST("/admin/work/status/create", authMiddleware.AuthMiddleware(), workStatusController.AdminCreateWorkStatus)
+		// delete
+		v1.DELETE("/admin/work/status/delete/:id", authMiddleware.AuthMiddleware(), workStatusController.AdminDeleteWorkStatus)
+		// list
+		v1.GET("/admin/work/status/list", authMiddleware.AuthMiddleware(), workStatusController.AdminGetWorkStatusList)
+		// get by id
+		v1.GET("/admin/work/status/:id", authMiddleware.AuthMiddleware(), workStatusController.AdminGetWorkStatusById)
+		// update
+		v1.PATCH("/admin/work/status/update/:id", authMiddleware.AuthMiddleware(), workStatusController.AdminUpdateWorkStatus)
 
 	}
 

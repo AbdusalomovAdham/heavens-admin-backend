@@ -4,8 +4,8 @@ import (
 	"context"
 	"fmt"
 	"log"
+	"main/internal/entity"
 	"main/internal/usecase/room"
-	"main/internal/usecase/user"
 	"strings"
 
 	"github.com/uptrace/bun"
@@ -41,7 +41,7 @@ func (r Repository) Delete(ctx context.Context, id, userID int64) error {
 	return nil
 }
 
-func (r Repository) GetList(ctx context.Context, filter *user.Filter) ([]room.RoomPreview, uint32, error) {
+func (r Repository) GetList(ctx context.Context, filter *entity.Filter) ([]room.RoomPreview, uint32, error) {
 	var list []room.RoomPreview
 
 	var limitQuery, offsetQuery string

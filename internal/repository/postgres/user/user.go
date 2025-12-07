@@ -104,7 +104,7 @@ func (r *Repository) Delete(ctx context.Context, id, deletedBy int64) error {
 	return nil
 }
 
-func (r *Repository) GetList(ctx context.Context, filter user.Filter) ([]user.UserPreview, int, error) {
+func (r *Repository) GetList(ctx context.Context, filter entity.Filter) ([]user.UserPreview, int, error) {
 	var list []user.UserPreview
 	var limitQuery, offsetQuery string
 

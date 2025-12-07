@@ -3,7 +3,6 @@ package roomtype
 import (
 	"context"
 	"main/internal/entity"
-	"main/internal/usecase/user"
 )
 
 type UseCase struct {
@@ -46,7 +45,7 @@ func (uc *UseCase) GetById(ctx context.Context, id int64) (entity.RoomType, erro
 	return uc.repo.GetById(ctx, id)
 }
 
-func (uc *UseCase) GetList(ctx context.Context, filter *user.Filter, authHeader string) ([]entity.RoomType, uint32, error) {
+func (uc *UseCase) GetList(ctx context.Context, filter *entity.Filter, authHeader string) ([]entity.RoomType, uint32, error) {
 	token, err := uc.auth.IsValidToken(ctx, authHeader)
 	if err != nil {
 		return nil, 0, err

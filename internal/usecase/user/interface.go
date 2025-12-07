@@ -12,7 +12,7 @@ type Repository interface {
 	GetByLogin(ctx context.Context, login string) (entity.User, error)
 	GetById(ctx context.Context, id int64) (entity.User, error)
 	Delete(ctx context.Context, id, deletedBy int64) error
-	GetList(ctx context.Context, filter Filter) ([]UserPreview, int, error)
+	GetList(ctx context.Context, filter entity.Filter) ([]UserPreview, int, error)
 	Update(ctx context.Context, id int64, data Update) (int64, error)
 }
 

@@ -63,7 +63,7 @@ func (uc UseCase) AdminGetUserDetail(ctx context.Context, id int64) (entity.User
 	return detail, nil
 }
 
-func (uc UseCase) AdminGetUserList(ctx context.Context, filter Filter) ([]UserPreview, int, error) {
+func (uc UseCase) AdminGetUserList(ctx context.Context, filter entity.Filter) ([]UserPreview, int, error) {
 	users, count, err := uc.repo.GetList(ctx, filter)
 	if err != nil {
 		return nil, 0, err

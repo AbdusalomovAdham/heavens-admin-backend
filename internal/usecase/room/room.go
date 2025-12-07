@@ -2,7 +2,7 @@ package room
 
 import (
 	"context"
-	"main/internal/usecase/user"
+	"main/internal/entity"
 )
 
 type UseCase struct {
@@ -37,7 +37,7 @@ func (uc UseCase) DeleteRoom(ctx context.Context, id int64, authHeader string) e
 	return err
 }
 
-func (uc UseCase) GetList(ctx context.Context, filter *user.Filter) ([]RoomPreview, uint32, error) {
+func (uc UseCase) GetList(ctx context.Context, filter *entity.Filter) ([]RoomPreview, uint32, error) {
 	list, count, err := uc.repo.GetList(ctx, filter)
 	if err != nil {
 		return nil, 0, err
