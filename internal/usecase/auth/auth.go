@@ -28,7 +28,7 @@ func (au UseCase) SignIn(ctx context.Context, data SignIn) (entity.User, string,
 			return entity.User{}, "", errors.New("password error")
 		}
 	} else {
-		return entity.User{}, "", errors.New("user not found")
+		return entity.User{}, "", errors.New("User not found")
 	}
 
 	var generateTokenData GenerateToken
