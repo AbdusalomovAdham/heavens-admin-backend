@@ -162,7 +162,7 @@ func (r *Repository) GetList(ctx context.Context, filter entity.Filter) ([]user.
 		return nil, 0, err
 	}
 
-	countQuery := `SELECT COUNT(u.id) FROM users u`
+	countQuery := `SELECT COUNT(u.id) FROM users u WHERE u.deleted_at IS NULL`
 
 	countRows, err := r.QueryContext(ctx, countQuery)
 	if err != nil {

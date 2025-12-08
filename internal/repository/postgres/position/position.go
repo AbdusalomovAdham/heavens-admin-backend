@@ -23,8 +23,8 @@ func NewRepository(DB *bun.DB) *Repository {
 func (r *Repository) Create(ctx context.Context, position position.Create, userId int64) (int64, error) {
 	var id int64
 
-	query := `INSERT INTO departments (name, created_by, status) VALUES (?, ?, ?) RETURNING id`
-	if err := r.QueryRowContext(ctx, query, position.Name, userId, position.Status).Scan(&id); err != nil {
+	query := `INSERT INTO positions (name, created_by, status, department_id) VALUES (?, ?, ?, ?) RETURNING id`
+	if err := r.QueryRowContext(ctx, query, position.Name, userId, position.Status, position.DepartmentId).Scan(&id); err != nil {
 		return 0, err
 	}
 	return id, nil
@@ -44,7 +44,7 @@ func (r *Repository) Delete(ctx context.Context, id int64, userId int64) error {
 func (r *Repository) GetById(ctx context.Context, id int64) (position.PositionById, error) {
 	var detail position.PositionById
 
-	query := `SELECT id, status, created_at, name FROM positions WHERE id = ?`
+	query := `SELECT id, status, created_at, department_id,name FROM positions WHERE id = ? AND deleted_at IS NULL`
 
 	rows, err := r.QueryContext(ctx, query, id)
 	if err != nil {
@@ -90,7 +90,8 @@ func (r *Repository) GetList(ctx context.Context, filter entity.Filter, lang str
 	        p.id,
 	        p.name->>'%s' as name,
 	        p.status,
-	        p.created_at
+	        p.created_at,
+	        p.department_id
 	    FROM positions p
 	    %s %s %s %s
 	`, lang, whereQuery, orderQuery, limitQuery, offsetQuery)
@@ -106,7 +107,7 @@ func (r *Repository) GetList(ctx context.Context, filter entity.Filter, lang str
 		return nil, 0, err
 	}
 
-	countQuery := `SELECT COUNT(p.id) FROM positions p`
+	countQuery := `SELECT COUNT(p.id) FROM positions p WHERE p.deleted_at IS NULL`
 
 	countRows, err := r.QueryContext(ctx, countQuery)
 	if err != nil {
@@ -125,7 +126,7 @@ func (r *Repository) GetList(ctx context.Context, filter entity.Filter, lang str
 func (r *Repository) Update(ctx context.Context, id int64, data position.Update, userId int64) error {
 	var position entity.Position
 	var nameJSON []byte
-	query := `SELECT id, name, status, updated_at, updated_by FROM positions WHERE id = ?`
+	query := `SELECT id, name, status, updated_at, updated_by FROM positions WHERE id = ? AND deleted_at IS NULL`
 	if err := r.QueryRowContext(ctx, query, id).Scan(&position.Id, &nameJSON, &position.Status, &position.UpdatedAt, &position.UpdatedBy); err != nil {
 		return err
 	}

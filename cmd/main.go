@@ -3,7 +3,9 @@ package main
 import (
 	auth_controller "main/internal/controllers/http/v1/auth"
 
+	attendance_template_controller "main/internal/controllers/http/v1/attendance_template"
 	department_controller "main/internal/controllers/http/v1/department"
+	position_controller "main/internal/controllers/http/v1/position"
 	qr_controller "main/internal/controllers/http/v1/qr_code"
 	role_controller "main/internal/controllers/http/v1/role"
 	room_controller "main/internal/controllers/http/v1/room"
@@ -13,7 +15,9 @@ import (
 	auth_middleware "main/internal/middleware/auth"
 	"main/internal/pkg/config"
 	"main/internal/pkg/postgres"
+	attendancetemplate "main/internal/repository/postgres/attendance_template"
 	department "main/internal/repository/postgres/department"
+	"main/internal/repository/postgres/position"
 	"main/internal/repository/postgres/qr"
 	"main/internal/repository/postgres/role"
 	"main/internal/repository/postgres/room"
@@ -23,8 +27,10 @@ import (
 	"main/internal/services/auth"
 	file_service "main/internal/services/file"
 
+	attendance_template_use_case "main/internal/usecase/attendance_template"
 	auth_use_case "main/internal/usecase/auth"
 	department_use_case "main/internal/usecase/department"
+	position_use_case "main/internal/usecase/position"
 	qr_use_case "main/internal/usecase/qr_code"
 	role_use_case "main/internal/usecase/role"
 	room_use_case "main/internal/usecase/room"
@@ -56,6 +62,8 @@ func main() {
 	roomTypeRepository := roomtype.NewRepository(postgresDB)
 	roleRepository := role.NewRepository(postgresDB)
 	workStatusRepository := work_status.NewRepository(postgresDB)
+	positionRepository := position.NewRepository(postgresDB)
+	attendanceTemplateRepository := attendancetemplate.NewRepository(postgresDB)
 
 	//services
 	authService := auth.NewService(userRepository)
@@ -75,6 +83,8 @@ func main() {
 	roomTypeUseCase := room_type_use_case.NewUseCase(roomTypeRepository, authService)
 	roleUseCase := role_use_case.NewUseCase(roleRepository, authService)
 	workStatusUseCase := work_status_use_case.NewUseCase(workStatusRepository, authService)
+	positionUseCase := position_use_case.NewUseCase(positionRepository, authService)
+	attendanceTemplateUseCase := attendance_template_use_case.NewUseCase(attendanceTemplateRepository, authService)
 
 	//controller
 	authController := auth_controller.NewController(authUseCase)
@@ -85,6 +95,8 @@ func main() {
 	roomTypeController := room_type_controller.NewController(roomTypeUseCase)
 	roleController := role_controller.NewController(roleUseCase)
 	workStatusController := work_status_controller.NewController(workStatusUseCase)
+	positionController := position_controller.NewController(positionUseCase)
+	attendanceTemplateController := attendance_template_controller.NewController(attendanceTemplateUseCase)
 
 	//middleware
 	authMiddleware := auth_middleware.NewMiddleware(authService)
@@ -181,6 +193,29 @@ func main() {
 		// update
 		v1.PATCH("/admin/work/status/update/:id", authMiddleware.AuthMiddleware(), workStatusController.AdminUpdateWorkStatus)
 
+		// #position
+		// create
+		v1.POST("/admin/position/create", authMiddleware.AuthMiddleware(), positionController.AdminCreatePosition)
+		// delete
+		v1.DELETE("/admin/position/delete/:id", authMiddleware.AuthMiddleware(), positionController.AdminDeletePosition)
+		// list
+		v1.GET("/admin/position/list", authMiddleware.AuthMiddleware(), positionController.AdminGetPositionList)
+		// get by id
+		// v1.GET("/admin/position/:id", authMiddleware.AuthMiddleware(), positionController.AdminGetPositionById)
+		// update
+		v1.PATCH("/admin/position/update/:id", authMiddleware.AuthMiddleware(), positionController.AdminUpdatePosition)
+
+		// #attendance_template
+		// create
+		v1.POST("/admin/attendance/template/create", authMiddleware.AuthMiddleware(), attendanceTemplateController.AdminCreateAttendanceTemplate)
+		// list
+		v1.GET("/admin/attendance/template/list", authMiddleware.AuthMiddleware(), attendanceTemplateController.AdminGetAttendanceTemplateList)
+		// get by id
+		v1.GET("/admin/attendance/template/:id", authMiddleware.AuthMiddleware(), attendanceTemplateController.AdminGetAttendanceTemplateById)
+		//delete
+		v1.DELETE("/admin/attendance/template/delete/:id", authMiddleware.AuthMiddleware(), attendanceTemplateController.AdminDeleteAttendanceTemplate)
+		// update
+		v1.PATCH("/admin/attendance/template/update/:id", authMiddleware.AuthMiddleware(), attendanceTemplateController.AdminUpdateAttendanceTemplate)
 	}
 
 	r.Run(serverPost)
