@@ -26,7 +26,7 @@ jobs:
         run: go test ./... -v
 
       - name: Build binary
-        run: go build -o heavens-backend ./cmd/heavens-backend
+        run: go build -o heavens-backend ./cmd/main.go
 
       - name: Deploy to server
         if: github.ref == 'refs/heads/main'
